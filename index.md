@@ -1,37 +1,80 @@
-## Welcome to GitHub Pages
+# QuantAI项目介绍
 
-You can use the [editor on GitHub](https://github.com/QuantAILab/QuantAILab/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+`QuantAI` 项目由 `QuantAILab` 开发维护，力图通过深度学习相关的方法，实现量化交易。
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+## 整体架构
 
-### Markdown
+![项目整体框架](assert/framework.png)
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+## QuantAI
 
-```markdown
-Syntax highlighted code block
+`QuantAI` 将现有的股票、期货市场交易逻辑进行封装，并且提供了完整的回测框架。
 
-# Header 1
-## Header 2
-### Header 3
+## QuantRec\Text\Agent
 
-- Bulleted
-- List
+- `QuantRec` 是一个股票推荐算法库，里面集成了深度学习相关的推荐算法。
+- `QuantText` 是一个统一的文本处理库，里面集成了许多自然语言模型。
+- `QuantAgent` 是一个全面的深度强化学习算法库，里面集成了最新的强化学习算法。
 
-1. Numbered
-2. List
+`QuantAI` 的智能决策行为主要依赖这三个算法库提供支持。
+值得注意的是这三个算法库本身并不提供训练和预训练的模型。
+而是仅仅提供了通用的算法模型本身。
 
-**Bold** and _Italic_ and `Code` text
+## Nebula, Aurora, Polaris
 
-[Link](url) and ![Image](src)
-```
+`Nebula`, `Aurora`, `Polaris` 分别是`QuantText\Agent\Rec`算法库对应的训练平台。
+这些平台能够根据具体业务，对初始模型(raw algorithm)进行训练和优化。
 
-For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
+## Starry
 
-### Jekyll Themes
+`Starry` 会将 `Nebula, Aurora, Polaris` 三个平台所得到的业务模型(cooked algorithm)进行封装。
+`Starry` 可以让用户完全屏蔽底层的算法模型，而仅仅关注提供的服务（如舆论分析，股票涨跌预测）。
+这可以提高策略安全性，降低用户的学习成本。
+该模块会提供一个 `Mod` 扩展，加入到 `QuantAI` 中直接调用。
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/QuantAILab/QuantAILab/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+## QuantDB
 
-### Support or Contact
+`QuantDB` 基于 `pymongo` 做了进一步封装，使得上层用户可以屏蔽底层的数据库操作细节。
+`QuantDB` 使得用户可以使用python基本类型一样使用 `pymongo`。
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+## QuantSpider
+
+`QuantSpider` 是一个纯粹的爬虫库，这里面提供了各种爬虫工具，尽可能的屏蔽了不同数据源的处理逻辑（例如html等），使得用户可以专注于所需要抓取的数据本身。
+
+## datac
+
+`datac` 基于 `QuantDB` 的基础上，对金融市场的相关内容做了封装。
+例如提供了基本的股票、期货等数据类型的相关定义等。
+用户可以通过 `datac` 将原始零散的数据组织成合理的数据结构方便存取调用。
+`QuantAI` 将通过这个模块调用数据库中的相关数据，`datad` 则会使用这个模块将收集到的数据存储到数据库中。
+
+## datad
+
+`datad` 负责所有的数据获取，包括从网络上爬取股票、舆论数据等。
+也包括将股票数据导入到数据库中，或者从数据库中导出指定格式的数据。
+
+## Quanter
+
+`Quanter` 模块是一个web后端。主要提供用户的访问权限控制以及相应的业务逻辑。
+`Quanter` 会通过 `QuantDB` 存储一些用户资料，例如个人信息、策略文件等，但不会通过 `QuantDB` 读取任何股票、基金的数据信息。
+所有的数据信息都是由 `QuantAI` 通过 `datac` 进行读取的。
+
+## QuantUI
+
+`QuantUI` 是提供的web交互界面。该界面可以实现策略的编写等操作。
+通常情况下，UI界面提供的操作都可以直接通过调用 `QuantAI` 来实现。
+但是为了方便用户远程编写策略、部署任务，我们还是提供了功能丰富的UI界面。
+
+## QuantBase
+
+`QuantBase` 是一个最为基础的组件库。里面提供了一些日志记录、参数读取等统一的基础工具。
+该项目的其他模块都可以调用 `QuantBase` 中提供的工具。
+提供 `QuantBase` 主要也是为了能够更好的简化代码、统一风格。
+
+## 总的来说
+
+除了需要将数据存储在数据库 `MongoDB` 外，其余的模块都是可以任由用户在本地搭建的。
+（因为数据量高达数TB，所以我们没法将数据全量提供给大家用于本地部署。）
+
+大家也可以自己重新搭建一个本地的数据库去抓取自己的数据，但是我们不建议这么做。
+数据的处理十分耗费精力，所以还是建议使用我们提供的数据源。
