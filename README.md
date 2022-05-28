@@ -1,5 +1,9 @@
 # QuantAI
 
+## News
+
+Start of reconstruction from a more professional aspect of financial analysis.
+
 ## Setup
 
 Base env setup:
